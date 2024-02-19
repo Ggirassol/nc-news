@@ -1,10 +1,14 @@
 const express = require('express')
-const { getTopics } = require("./controllers");
+const { getTopics, getDescription } = require("./controllers");
 const app = express();
 
 
 
 app.get("/api/topics", getTopics)
+
+app.get("/api", getDescription)
+
+
 
 app.get("*", (req,res) => {
     res.status(404).send({ msg: 'Page not found' });
