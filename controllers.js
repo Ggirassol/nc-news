@@ -1,4 +1,4 @@
-const { selectTopics } = require("./models")
+const { selectTopics, selectDescription } = require("./models")
 
 
 
@@ -10,4 +10,13 @@ function getTopics(req, res, next) {
     .catch((err) => next(err))
 }
 
-module.exports = { getTopics }
+function getDescription(req, res, next) {
+    selectDescription()
+    .then((description) => {
+        res.status(200).send( {description} )
+    })
+    .catch((err) => next(err))
+}
+
+
+module.exports = { getTopics, getDescription }
