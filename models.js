@@ -1,5 +1,6 @@
 const db = require('./db/connection')
 const fs = require('fs/promises')
+const format = require('pg-format')
 
 function selectTopics() {
     return db.query(`SELECT * FROM topics`)
@@ -47,5 +48,19 @@ function selectCommentsByArticleId(articleId) {
     })
 }
 
+function addComment(articleId, username, body) {
+    if (!username || !body) {
+        return Promise.reject({ status: 400, msg: 'Bad request' });
+    }
+    return db.query(`INSERT INTO comments
+    (body, author, article_id, votes)
+    VALUES
+    ($1, $2, $3, 0)
+    RETURNING *;`, [body, username, articleId])
+    .then((data) => {
+        return data.rows[0]
+    })
+}
 
-module.exports = { selectTopics, selectDescription, selectArticleById, selectArticles, selectCommentsByArticleId}
+
+module.exports = { selectTopics, selectDescription, selectArticleById, selectArticles, selectCommentsByArticleId, addComment}
