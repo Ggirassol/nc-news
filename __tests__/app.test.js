@@ -273,6 +273,69 @@ describe("POST /api/articles/:article_id/comments", () => {
   });
 });
 
+describe("PATCH /api/articles/:article_id", () => {
+  it("responds with updated article's votes using the respective article_id. Status code: 200", () => {
+    return request(app)
+      .patch("/api/articles/4")
+      .send({
+        inc_votes: 5
+      })
+      .expect(200)
+      .then((res) => {
+        const updatedArticle = res.body.updatedArticle
+        expect(updatedArticle.votes).toBe(5)
+      })
+  });
+  it("updates a given article's votes by article_id when inc_votes is negative", () => {
+    return request(app)
+      .patch("/api/articles/4")
+      .send({
+        inc_votes: -5
+      })
+      .expect(200)
+      .then((res) => {
+        const updatedArticle = res.body.updatedArticle
+        expect(updatedArticle.votes).toBe(-5)
+      })
+  });
+  it("responds with an error when request body doesn't have inc_votes property", () => {
+    return request(app)
+      .patch("/api/articles/3")
+      .send({
+        votes: 10
+      })
+      .expect(400)
+      .then((res) => {
+        const err = res.body
+        expect(err.msg).toBe("Bad request")
+      })
+  });
+  it("responds with an error when article type is invalid", () => {
+    return request(app)
+      .patch("/api/articles/one")
+      .send({
+        inc_votes: 5
+      })
+      .expect(400)
+      .then((res) => {
+        const err = res.body;
+        expect(err.msg).toBe("Bad request");
+      });
+  });
+  it("responds with error when article types is valid, but article does not exist", () => {
+    return request(app)
+      .patch("/api/articles/101")
+      .send({
+        inc_votes: 5
+      })
+      .expect(404)
+      .then((res) => {
+        const err = res.body;
+        expect(err.msg).toBe("Article id not found");
+      });
+  });
+})
+
 describe("invalid api endpoint", () => {
   it("responds with 404 status", () => {
     return request(app)

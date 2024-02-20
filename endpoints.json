@@ -58,5 +58,35 @@
         }
       ]
     }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "adds a comment for an article",
+    "exampleResponse": {
+      "newComment": [
+        {
+          "comment_id": 10,
+          "votes": 0,
+          "created_at": "2020-07-09T20:11:00.000Z",
+          "author": "butter_fly",
+          "body": "So in love with this article",
+          "article_id": 3
+        }
+      ]
+    }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "updates votes for a given article",
+    "exampleResponse": {
+      "updatedArticle": [
+        {
+          "comment_id": 10,
+          "votes": 10,
+          "created_at": "2020-07-09T20:11:00.000Z",
+          "author": "butter_fly",
+          "body": "So in love with this article",
+          "article_id": 3
+        }
+      ]
+    }
   }
 }

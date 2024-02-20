@@ -1,4 +1,4 @@
-const { selectTopics, selectDescription, selectArticleById, selectArticles, selectCommentsByArticleId, addComment } = require("./models")
+const { selectTopics, selectDescription, selectArticleById, selectArticles, selectCommentsByArticleId, addComment, updateVotesByArticleId } = require("./models")
 
 
 
@@ -53,10 +53,21 @@ function createComment(req, res, next) {
 
     Promise.all(promises) 
     .then((results) => {
-        console.log(results)
         res.status(201).send({ newComment: results[1]})
     })
     .catch((err) => next(err))
 }
 
-module.exports = { getTopics, getDescription, getArticleById, getArticles, getCommentsByArticleId, createComment }
+function editVotesByArticleId(req, res, next) {
+    const articleId = req.params.article_id
+    const { inc_votes } = req.body
+    const promises = [ selectArticleById(articleId), updateVotesByArticleId(articleId, inc_votes)]
+
+    Promise.all(promises) 
+    .then((results) => {
+        res.status(200).send({ updatedArticle: results[1]})
+    })
+    .catch((err) => next(err))
+}
+
+module.exports = { getTopics, getDescription, getArticleById, getArticles, getCommentsByArticleId, createComment, editVotesByArticleId }
