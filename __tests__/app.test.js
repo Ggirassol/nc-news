@@ -3,7 +3,8 @@ const db = require("../db/connection.js");
 const seed = require("../db/seeds/seed.js");
 const testData = require("../db/data/test-data/index.js");
 const request = require("supertest");
-const fs = require("fs/promises");
+const endpoints = require('../endpoints.json')
+const sort = require("jest-sorted");
 
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
@@ -44,10 +45,7 @@ describe("GET /api/", () => {
       .get("/api")
       .then((res) => {
         const description = res.body.description;
-        return fs.readFile("endpoints.json", "utf-8").then((data) => {
-          const parsedEndpoints = JSON.parse(data);
-          expect(description.description).toEqual(parsedEndpoints);
-        });
+          expect(description.description).toEqual(endpoints);
       });
   });
 });
@@ -81,7 +79,7 @@ describe("GET /api/articles/:article_id", () => {
         expect(err.msg).toBe("Bad request");
       });
   });
-  it('responds with error when article types is valid, but article does not exist', () => {
+  it("responds with error when article types is valid, but article does not exist", () => {
     return request(app)
       .get("/api/articles/101")
       .expect(404)
@@ -89,6 +87,62 @@ describe("GET /api/articles/:article_id", () => {
         const err = res.body;
         expect(err.msg).toBe("Article id not found");
       });
+  });
+});
+
+describe("GET /api/articles", () => {
+  it('responds with an array of article objects with the respective length. Status code: 200', () => {
+    return request(app)
+    .get("/api/articles")
+    .expect(200)
+    .then((res) => {
+      const articles = res.body.articles;
+      expect(articles).toHaveLength(13)
+    })
+  });
+  it("responds with an array of article objects with the respective length, having their respective properties. No body property", () => {
+    return request(app)
+      .get("/api/articles")
+      .then((res) => {
+        const articles = res.body.articles;
+        articles.forEach((article) => {
+          expect(article).toMatchObject({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            topic: expect.any(String),
+            author: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(String)
+          });
+          expect(article).not.toHaveProperty('body')
+        });
+      });
+  });
+  it("comment_count provides the right ammount of comments", () => {
+    return request(app)
+      .get("/api/articles")
+      .then((res) => {
+        const articles = res.body.articles
+        articles.forEach(article => {
+          let count = 0;
+          testData.commentData.forEach(comment => {
+            if (comment.article_id === article.article_id) {
+              count++
+            }
+          })
+          expect(article.comment_count).toBe(count.toString())
+        })
+      })
+  })
+  it('articles array is sorted by date in descending order', () => {
+    return request(app)
+      .get("/api/articles")
+      .then((res) => {
+        const articles = res.body.articles
+        expect(articles).toBeSortedBy("created_at", {descending: true})
+      })
   })
 });
 
