@@ -1,4 +1,4 @@
-const { selectTopics, selectDescription, selectArticleById, selectArticles } = require("./models")
+const { selectTopics, selectDescription, selectArticleById, selectArticles, selectCommentsByArticleId } = require("./models")
 
 
 
@@ -35,5 +35,19 @@ function getArticles(req, res, next) {
     .catch((err) => next(err))
 }
 
+function getCommentsByArticleId(req, res, next) {
+    const articleId = req.params.article_id
+    const promises = [ selectArticleById(articleId), selectCommentsByArticleId(articleId)]
 
-module.exports = { getTopics, getDescription, getArticleById, getArticles }
+    Promise.all(promises) 
+    .then((results) => {
+        if (results[1].length === 0) {
+            res.status(201).send({ comments: results[1]});
+        } else {
+            res.status(200).send({ comments: results [1]});
+        }
+    })
+    .catch((err) => next(err))
+}
+
+module.exports = { getTopics, getDescription, getArticleById, getArticles, getCommentsByArticleId }

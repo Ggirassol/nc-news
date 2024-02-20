@@ -29,7 +29,7 @@ function selectArticleById (articleId) {
 
 function selectArticles() {
     return db.query(`SELECT articles.article_id, title, articles.author, topic, articles.created_at, articles.votes, article_img_url,
-    COUNT(comment_id) AS comment_count FROM articles
+    COUNT(comment_id)::int AS comment_count FROM articles
     LEFT JOIN comments ON articles.article_id = comments.article_id
     GROUP BY articles.article_id
     ORDER BY articles.created_at DESC`)
@@ -38,6 +38,14 @@ function selectArticles() {
     })
 }
 
+function selectCommentsByArticleId(articleId) {
+    return db.query(`SELECT * FROM comments
+    WHERE article_id = $1
+    ORDER BY created_at DESC`, [articleId])
+    .then((data) => {
+        return data.rows
+    })
+}
 
 
-module.exports = { selectTopics, selectDescription, selectArticleById, selectArticles }
+module.exports = { selectTopics, selectDescription, selectArticleById, selectArticles, selectCommentsByArticleId}
