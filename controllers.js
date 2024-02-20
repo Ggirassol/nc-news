@@ -1,4 +1,4 @@
-const { selectTopics, selectDescription, selectArticleById } = require("./models")
+const { selectTopics, selectDescription, selectArticleById, selectArticles } = require("./models")
 
 
 
@@ -27,5 +27,13 @@ function getArticleById(req, res, next) {
     .catch((err) => next(err))
 }
 
+function getArticles(req, res, next) {
+    selectArticles()
+    .then((articles) => {
+        res.status(200).send( {articles} )
+    })
+    .catch((err) => next(err))
+}
 
-module.exports = { getTopics, getDescription, getArticleById }
+
+module.exports = { getTopics, getDescription, getArticleById, getArticles }
