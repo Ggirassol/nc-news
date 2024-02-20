@@ -147,7 +147,16 @@ describe("GET /api/articles", () => {
 });
 
 describe("GET /api/articles/:article_id/comments", () => {
-  it("responds with an array of comments for the given article_id. All comments have respective correct properties. Status code: 200", () => {
+  it("responds with an array of comments for the given array with the right length. Status code: 200", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then((res) => {
+        const comments = res.body.comments;
+        expect(comments).toHaveLength(11);
+      });
+  });
+  it("responds with an array of comments for the given article_id. All comments have respective correct properties", () => {
     return request(app)
       .get("/api/articles/1/comments")
       .expect(200)
@@ -194,10 +203,72 @@ describe("GET /api/articles/:article_id/comments", () => {
   it("responds with empty array when given article exists but there are no associated comments", () => {
     return request(app)
       .get("/api/articles/2/comments")
+      .expect(200)
+      .then((res) => {
+        const comments = res.body.comments;
+        expect(comments).toHaveLength(0);
+      });
+  });
+});
+
+describe("POST /api/articles/:article_id/comments", () => {
+  it("responds with the posted comment when request body is an object with username an body properties. Status code: 201", () => {
+    return request(app)
+      .post("/api/articles/3/comments")
+      .send({
+        username: "rogersop",
+        body: "So in love with this article"
+      })
       .expect(201)
       .then((res) => {
-        const comments = res.body.comments
-        expect(comments).toHaveLength(0)
+        const newComment = res.body.newComment;
+        expect(newComment).toMatchObject({
+          comment_id: 19,
+          votes: 0,
+          created_at: expect.any(String),
+          author: "rogersop",
+          body: "So in love with this article",
+          article_id: 3,
+        });
+      });
+  });
+  it("responds with an error when request body doesn't have username and body properties", () => {
+    return request(app)
+      .post("/api/articles/3/comments")
+      .send({
+        name: "rogersop",
+        comment: "So in love with this article",
+      })
+      .expect(400)
+      .then((res) => {
+        const err = res.body
+        expect(err.msg).toBe("Bad request")
+      })
+  });
+  it("responds with an error when article type is invalid", () => {
+    return request(app)
+      .post("/api/articles/one/comments")
+      .send({
+        username: "rogersop",
+        body: "So in love with this article"
+      })
+      .expect(400)
+      .then((res) => {
+        const err = res.body;
+        expect(err.msg).toBe("Bad request");
+      });
+  });
+  it("responds with error when article types is valid, but article does not exist", () => {
+    return request(app)
+      .post("/api/articles/101/comments")
+      .send({
+        username: "rogersop",
+        body: "So in love with this article"
+      })
+      .expect(404)
+      .then((res) => {
+        const err = res.body;
+        expect(err.msg).toBe("Article id not found");
       });
   });
 });
