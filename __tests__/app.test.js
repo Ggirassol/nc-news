@@ -245,6 +245,19 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(err.msg).toBe("Bad request")
       })
   });
+  it("responds with an error when unrecognised user trying to create a comment", () => {
+    return request(app)
+    .post("/api/articles/3/comments")
+      .send({
+        username: "NonExistent",
+        body: "So in love with this article",
+      })
+      .expect(400)
+      .then((res) => {
+        const err = res.body
+        expect(err.msg).toBe("Incorrect username")
+      })
+  })
   it("responds with an error when article type is invalid", () => {
     return request(app)
       .post("/api/articles/one/comments")
@@ -377,6 +390,25 @@ describe("DELETE /api/comments/:comment_id", () => {
         expect(err.msg).toBe("Comment id not found");
       });
   });
+})
+
+describe("GET /api/users", () => {
+  it("responds with an array of objects having the respective properties. Status code: 200", () => {
+    return request(app)
+    .get("/api/users")
+    .expect(200)
+    .then((res) => {
+      const users = res.body.users
+      expect(users).toHaveLength(4)
+      users.forEach(user => {
+        expect(user).toMatchObject({
+          username: expect.any(String),
+          name: expect.any(String)
+        })
+      })
+    })
+  })
+  
 })
 
 describe("invalid api endpoint", () => {

@@ -1,5 +1,5 @@
 const express = require('express')
-const { getTopics, getDescription, getArticleById, getArticles, getCommentsByArticleId, createComment, editVotesByArticleId, deleteCommentById, getCommentsById } = require("./controllers");
+const { getTopics, getDescription, getArticleById, getArticles, getCommentsByArticleId, createComment, editVotesByArticleId, deleteCommentById, getUsers } = require("./controllers");
 const app = express();
 app.use(express.json());
 
@@ -21,10 +21,19 @@ app.patch("/api/articles/:article_id", editVotesByArticleId)
 
 app.delete("/api/comments/:comment_id", deleteCommentById)
 
+app.get("/api/users", getUsers)
+
 
 app.get("*", (req,res) => {
     res.status(404).send({ msg: 'Page not found' });
 })
+
+app.use((err, req, res, next) => {
+  if (err.code === '23503') {
+    res.status(400).send({ msg: 'Incorrect username' })
+  }
+  next(err)
+});
 
 app.use((err, req, res, next) => {
     if (err.code === '22P02') {
