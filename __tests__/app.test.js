@@ -411,6 +411,39 @@ describe("GET /api/users", () => {
   
 })
 
+describe("GET /api/articles?topic=topic_slug", () => {
+  it("responds with an array of articles filtered by the topic value specified in the query. Status code: 200", () => {
+    return request(app)
+    .get("/api/articles?topic=mitch")
+    .expect(200)
+    .then((res) => {
+      const articles = res.body.articles
+      expect(articles).toHaveLength(12)
+      articles.forEach(article => {
+        expect(article.topic).toBe("mitch")
+      })
+    })
+  })
+  it("responds with error when topic does not exist", () => {
+    return request(app)
+      .get("/api/articles?topic=dragons")
+      .expect(400)
+      .then((res) => {
+        const err = res.body;
+        expect(err.msg).toBe("Topic does not exist");
+      });
+  });
+  it("responds with empty array when given a topic that exists but there are no associated articles", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then((res) => {
+        const articles = res.body.articles;
+        expect(articles).toHaveLength(0);
+      });
+  });
+})
+
 describe("invalid api endpoint", () => {
   it("responds with 404 status", () => {
     return request(app)

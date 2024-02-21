@@ -1,4 +1,4 @@
-const { selectTopics, selectDescription, selectArticleById, selectArticles, selectCommentsByArticleId, addComment, updateVotesByArticleId, removeCommentById, selectUsers } = require("./models")
+const { selectTopics, selectDescription, selectArticleById, selectArticles, selectCommentsByArticleId, addComment, updateVotesByArticleId, removeCommentById, selectUsers, checkIfTopicExists } = require("./models")
 
 
 
@@ -28,9 +28,13 @@ function getArticleById(req, res, next) {
 }
 
 function getArticles(req, res, next) {
-    selectArticles()
-    .then((articles) => {
-        res.status(200).send( {articles} )
+    const topic = req.query.topic
+
+    const promises = [ checkIfTopicExists(topic), selectArticles(topic)]
+
+    Promise.all(promises) 
+    .then((results) => {
+            res.status(200).send({ articles: results [1]});
     })
     .catch((err) => next(err))
 }

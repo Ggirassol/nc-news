@@ -27,15 +27,39 @@ function selectArticleById (articleId) {
     })
 }
 
-function selectArticles() {
-    return db.query(`SELECT articles.article_id, title, articles.author, topic, articles.created_at, articles.votes, article_img_url,
-    COUNT(comment_id)::int AS comment_count FROM articles
-    LEFT JOIN comments ON articles.article_id = comments.article_id
-    GROUP BY articles.article_id
-    ORDER BY articles.created_at DESC`)
-    .then((data) => {
-        return data.rows
-    })
+function checkIfTopicExists(topic) {
+    if(topic) {
+        return db.query("SELECT * FROM topics WHERE slug = $1", [topic])
+        .then((result) => {
+          if (result.rows.length === 0) {
+              return Promise.reject({ status: 400, msg: "Topic does not exist" });
+          }
+        })
+    }
+}
+
+function selectArticles(topic) {
+  let sqlString = `SELECT articles.article_id, title, articles.author, topic, articles.created_at, articles.votes, article_img_url,
+                COUNT(comment_id)::int AS comment_count FROM articles
+                LEFT JOIN comments ON articles.article_id = comments.article_id`;
+
+  const queryValues = [];
+
+  if (topic) {
+    sqlString += ` WHERE topic = $1`;
+    queryValues.push(topic);
+  }
+
+  sqlString += ` GROUP BY articles.article_id
+                ORDER BY articles.created_at DESC`;
+
+  return db.query(sqlString, queryValues)
+  .then((data) => {
+    if (data.rows.length === 0) {
+      return  [];
+    }
+    return data.rows;
+  });
 }
 
 function selectCommentsByArticleId(articleId) {
@@ -94,6 +118,15 @@ function selectUsers() {
   });
 }
 
-
-
-module.exports = { selectTopics, selectDescription, selectArticleById, selectArticles, selectCommentsByArticleId, addComment, updateVotesByArticleId, removeCommentById, selectUsers }
+module.exports = {
+  selectTopics,
+  selectDescription,
+  selectArticleById,
+  selectArticles,
+  selectCommentsByArticleId,
+  addComment,
+  updateVotesByArticleId,
+  removeCommentById,
+  selectUsers,
+  checkIfTopicExists,
+};
