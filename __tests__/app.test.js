@@ -336,6 +336,49 @@ describe("PATCH /api/articles/:article_id", () => {
   });
 })
 
+describe("DELETE /api/comments/:comment_id", () => {
+  it("responds with status 204 and no content", () => {
+    return request(app)
+    .delete("/api/comments/5")
+    .expect(204)
+    .then((res) => {
+      const body = res.body
+      expect(body).toEqual({})
+    })
+  })
+  it("deletes given comment", () => {
+    const deletedCommentId = 6;
+    return request(app)
+      .delete(`/api/comments/${deletedCommentId}`)
+      .expect(204)
+      .then(() => {
+        return db.query(`SELECT * FROM comments
+        WHERE comment_id = $1`, [deletedCommentId]);
+      })
+      .then((comment) => {
+        expect(comment.rows).toHaveLength(0);
+      });
+  });
+  it("responds with an error when comment type is invalid", () => {
+    return request(app)
+      .delete("/api/comments/one")
+      .expect(400)
+      .then((res) => {
+        const err = res.body;
+        expect(err.msg).toBe("Bad request");
+      });
+  });
+  it("responds with error when comment type is valid, but comment does not exist", () => {
+    return request(app)
+      .delete("/api/comments/101")
+      .expect(404)
+      .then((res) => {
+        const err = res.body;
+        expect(err.msg).toBe("Comment id not found");
+      });
+  });
+})
+
 describe("invalid api endpoint", () => {
   it("responds with 404 status", () => {
     return request(app)
