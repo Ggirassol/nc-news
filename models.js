@@ -111,7 +111,7 @@ function removeCommentById(commentId) {
     )
     .then((res) => {
     if (res.rowCount === 0) {
-        return Promise.reject({ status: 404, msg: 'Comment id not found' });
+        return Promise.reject({ status: 404, msg: 'No comment with given id found' });
     }
     })
 }

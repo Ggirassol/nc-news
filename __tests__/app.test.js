@@ -388,7 +388,7 @@ describe("DELETE /api/comments/:comment_id", () => {
       .expect(404)
       .then((res) => {
         const err = res.body;
-        expect(err.msg).toBe("Comment id not found");
+        expect(err.msg).toBe("No comment with given id found");
       });
   });
 })
