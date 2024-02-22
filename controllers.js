@@ -29,8 +29,10 @@ function getArticleById(req, res, next) {
 
 function getArticles(req, res, next) {
     const topic = req.query.topic
+    const sort_by = req.query.sort_by
+    const order_by = req.query.order_by
 
-    const promises = [ checkIfTopicExists(topic), selectArticles(topic)]
+    const promises = [ checkIfTopicExists(topic), selectArticles(topic, sort_by, order_by)]
 
     Promise.all(promises) 
     .then((results) => {
