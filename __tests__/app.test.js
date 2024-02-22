@@ -445,6 +445,111 @@ describe("GET /api/articles?topic=topic_slug", () => {
   });
 })
 
+describe("GET /api/articles?sort_by=any_valid_column apart from article_img_url", () => {
+  it("responds with an array of article objects sorted by article_id. Status code: 200", () => {
+    return request(app)
+    .get("/api/articles?sort_by=article_id")
+    .expect(200)
+    .then((res) => {
+      const articles = res.body.articles;
+      expect(articles).toBeSortedBy("article_id", { descending: true })
+    })
+  });
+  it("responds with an array of article objects sorted by title. Status code: 200", () => {
+    return request(app)
+    .get("/api/articles?sort_by=title")
+    .expect(200)
+    .then((res) => {
+      const articles = res.body.articles;
+      expect(articles).toBeSortedBy("title", { descending: true })
+    })
+  });
+  it("responds with an array of article objects sorted by author. Status code: 200", () => {
+    return request(app)
+    .get("/api/articles?sort_by=author")
+    .expect(200)
+    .then((res) => {
+      const articles = res.body.articles;
+      expect(articles).toBeSortedBy("author", { descending: true })
+    })
+  });
+  it("responds with an array of article objects sorted by topic. Status code: 200", () => {
+    return request(app)
+    .get("/api/articles?sort_by=topic")
+    .expect(200)
+    .then((res) => {
+      const articles = res.body.articles;
+      expect(articles).toBeSortedBy("topic", { descending: true })
+    })
+  });
+  it("responds with an array of article objects sorted by created_at. Status code: 200", () => {
+    return request(app)
+    .get("/api/articles?sort_by=created_at")
+    .expect(200)
+    .then((res) => {
+      const articles = res.body.articles;
+      expect(articles).toBeSortedBy("created_at", { descending: true })
+    })
+  });
+  it("responds with an array of article objects sorted by votes. Status code: 200", () => {
+    return request(app)
+    .get("/api/articles?sort_by=votes")
+    .expect(200)
+    .then((res) => {
+      const articles = res.body.articles;
+      expect(articles).toBeSortedBy("votes", { descending: true })
+    })
+  });
+  it("responds with error when passed invalid sort_by", () => {
+    return request(app)
+      .get("/api/articles?sort_by=article_img_url")
+      .expect(400)
+      .then((res) => {
+        const err = res.body;
+        expect(err.msg).toBe("invalid given sort_by");
+      });
+  });
+})
+
+describe("GET /api/articles?order=asc_or_desc", () => {
+  it("responds with an array of article objects sorted by ascending order. Status code: 200", () => {
+    return request(app)
+    .get("/api/articles?order_by=asc")
+    .expect(200)
+    .then((res) => {
+      const articles = res.body.articles
+      expect(articles).toBeSortedBy("created_at", {descending: false})
+    })
+  })
+  it("responds with an array of article objects sorted by descending order. Status code: 200", () => {
+    return request(app)
+    .get("/api/articles?order_by=desc")
+    .expect(200)
+    .then((res) => {
+      const articles = res.body.articles
+      expect(articles).toBeSortedBy("created_at", {descending: true})
+    })
+  })
+  it("it responds with an array of article objects sorted by author with ascending order. Status code: 200", () => {
+    return request(app)
+    .get("/api/articles?sort_by=author&order_by=asc")
+    .expect(200)
+    .then((res) => {
+      const articles = res.body.articles
+      expect(articles).toBeSortedBy("author", {descending: false})
+    })
+  })
+  it("responds with error when passed invalid order_by", () => {
+    return request(app)
+      .get("/api/articles?order_by=ascending")
+      .expect(400)
+      .then((res) => {
+        const err = res.body;
+        expect(err.msg).toBe("invalid given order_by");
+      });
+  });
+})
+
 describe("invalid api endpoint", () => {
   it("responds with 404 status", () => {
     return request(app)
