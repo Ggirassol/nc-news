@@ -67,7 +67,7 @@ describe("GET /api/articles/:article_id", () => {
           votes: 100,
           article_img_url:
             "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-          comment_count: 11
+          comment_count: 11,
         });
       });
   });
@@ -218,7 +218,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       .post("/api/articles/3/comments")
       .send({
         username: "rogersop",
-        body: "So in love with this article"
+        body: "So in love with this article",
       })
       .expect(201)
       .then((res) => {
@@ -242,29 +242,29 @@ describe("POST /api/articles/:article_id/comments", () => {
       })
       .expect(400)
       .then((res) => {
-        const err = res.body
-        expect(err.msg).toBe("Bad request")
-      })
+        const err = res.body;
+        expect(err.msg).toBe("Bad request");
+      });
   });
   it("responds with an error when unrecognised user trying to create a comment", () => {
     return request(app)
-    .post("/api/articles/3/comments")
+      .post("/api/articles/3/comments")
       .send({
         username: "NonExistent",
         body: "So in love with this article",
       })
       .expect(400)
       .then((res) => {
-        const err = res.body
-        expect(err.msg).toBe("Incorrect username")
-      })
-  })
+        const err = res.body;
+        expect(err.msg).toBe("Incorrect username");
+      });
+  });
   it("responds with an error when article type is invalid", () => {
     return request(app)
       .post("/api/articles/one/comments")
       .send({
         username: "rogersop",
-        body: "So in love with this article"
+        body: "So in love with this article",
       })
       .expect(400)
       .then((res) => {
@@ -277,7 +277,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       .post("/api/articles/101/comments")
       .send({
         username: "rogersop",
-        body: "So in love with this article"
+        body: "So in love with this article",
       })
       .expect(404)
       .then((res) => {
@@ -292,43 +292,43 @@ describe("PATCH /api/articles/:article_id", () => {
     return request(app)
       .patch("/api/articles/4")
       .send({
-        inc_votes: 5
+        inc_votes: 5,
       })
       .expect(200)
       .then((res) => {
-        const updatedArticle = res.body.updatedArticle
-        expect(updatedArticle.votes).toBe(5)
-      })
+        const updatedArticle = res.body.updatedArticle;
+        expect(updatedArticle.votes).toBe(5);
+      });
   });
   it("updates a given article's votes by article_id when inc_votes is negative", () => {
     return request(app)
       .patch("/api/articles/4")
       .send({
-        inc_votes: -5
+        inc_votes: -5,
       })
       .expect(200)
       .then((res) => {
-        const updatedArticle = res.body.updatedArticle
-        expect(updatedArticle.votes).toBe(-5)
-      })
+        const updatedArticle = res.body.updatedArticle;
+        expect(updatedArticle.votes).toBe(-5);
+      });
   });
   it("responds with an error when request body doesn't have inc_votes property", () => {
     return request(app)
       .patch("/api/articles/3")
       .send({
-        votes: 10
+        votes: 10,
       })
       .expect(400)
       .then((res) => {
-        const err = res.body
-        expect(err.msg).toBe("Bad request")
-      })
+        const err = res.body;
+        expect(err.msg).toBe("Bad request");
+      });
   });
   it("responds with an error when article type is invalid", () => {
     return request(app)
       .patch("/api/articles/one")
       .send({
-        inc_votes: 5
+        inc_votes: 5,
       })
       .expect(400)
       .then((res) => {
@@ -340,7 +340,7 @@ describe("PATCH /api/articles/:article_id", () => {
     return request(app)
       .patch("/api/articles/101")
       .send({
-        inc_votes: 5
+        inc_votes: 5,
       })
       .expect(404)
       .then((res) => {
@@ -348,26 +348,29 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(err.msg).toBe("Article id not found");
       });
   });
-})
+});
 
 describe("DELETE /api/comments/:comment_id", () => {
   it("responds with status 204 and no content", () => {
     return request(app)
-    .delete("/api/comments/5")
-    .expect(204)
-    .then((res) => {
-      const body = res.body
-      expect(body).toEqual({})
-    })
-  })
+      .delete("/api/comments/5")
+      .expect(204)
+      .then((res) => {
+        const body = res.body;
+        expect(body).toEqual({});
+      });
+  });
   it("deletes given comment", () => {
     const deletedCommentId = 6;
     return request(app)
       .delete(`/api/comments/${deletedCommentId}`)
       .expect(204)
       .then(() => {
-        return db.query(`SELECT * FROM comments
-        WHERE comment_id = $1`, [deletedCommentId]);
+        return db.query(
+          `SELECT * FROM comments
+        WHERE comment_id = $1`,
+          [deletedCommentId]
+        );
       })
       .then((comment) => {
         expect(comment.rows).toHaveLength(0);
@@ -391,40 +394,39 @@ describe("DELETE /api/comments/:comment_id", () => {
         expect(err.msg).toBe("No comment with given id found");
       });
   });
-})
+});
 
 describe("GET /api/users", () => {
   it("responds with an array of objects having the respective properties. Status code: 200", () => {
     return request(app)
-    .get("/api/users")
-    .expect(200)
-    .then((res) => {
-      const users = res.body.users
-      expect(users).toHaveLength(4)
-      users.forEach(user => {
-        expect(user).toMatchObject({
-          username: expect.any(String),
-          name: expect.any(String)
-        })
-      })
-    })
-  })
-  
-})
+      .get("/api/users")
+      .expect(200)
+      .then((res) => {
+        const users = res.body.users;
+        expect(users).toHaveLength(4);
+        users.forEach((user) => {
+          expect(user).toMatchObject({
+            username: expect.any(String),
+            name: expect.any(String),
+          });
+        });
+      });
+  });
+});
 
 describe("GET /api/articles?topic=topic_slug", () => {
   it("responds with an array of articles filtered by the topic value specified in the query. Status code: 200", () => {
     return request(app)
-    .get("/api/articles?topic=mitch")
-    .expect(200)
-    .then((res) => {
-      const articles = res.body.articles
-      expect(articles).toHaveLength(12)
-      articles.forEach(article => {
-        expect(article.topic).toBe("mitch")
-      })
-    })
-  })
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then((res) => {
+        const articles = res.body.articles;
+        expect(articles).toHaveLength(12);
+        articles.forEach((article) => {
+          expect(article.topic).toBe("mitch");
+        });
+      });
+  });
   it("responds with error when topic does not exist", () => {
     return request(app)
       .get("/api/articles?topic=dragons")
@@ -443,62 +445,62 @@ describe("GET /api/articles?topic=topic_slug", () => {
         expect(articles).toHaveLength(0);
       });
   });
-})
+});
 
 describe("GET /api/articles?sort_by=any_valid_column apart from article_img_url", () => {
   it("responds with an array of article objects sorted by article_id. Status code: 200", () => {
     return request(app)
-    .get("/api/articles?sort_by=article_id")
-    .expect(200)
-    .then((res) => {
-      const articles = res.body.articles;
-      expect(articles).toBeSortedBy("article_id", { descending: true })
-    })
+      .get("/api/articles?sort_by=article_id")
+      .expect(200)
+      .then((res) => {
+        const articles = res.body.articles;
+        expect(articles).toBeSortedBy("article_id", { descending: true });
+      });
   });
   it("responds with an array of article objects sorted by title. Status code: 200", () => {
     return request(app)
-    .get("/api/articles?sort_by=title")
-    .expect(200)
-    .then((res) => {
-      const articles = res.body.articles;
-      expect(articles).toBeSortedBy("title", { descending: true })
-    })
+      .get("/api/articles?sort_by=title")
+      .expect(200)
+      .then((res) => {
+        const articles = res.body.articles;
+        expect(articles).toBeSortedBy("title", { descending: true });
+      });
   });
   it("responds with an array of article objects sorted by author. Status code: 200", () => {
     return request(app)
-    .get("/api/articles?sort_by=author")
-    .expect(200)
-    .then((res) => {
-      const articles = res.body.articles;
-      expect(articles).toBeSortedBy("author", { descending: true })
-    })
+      .get("/api/articles?sort_by=author")
+      .expect(200)
+      .then((res) => {
+        const articles = res.body.articles;
+        expect(articles).toBeSortedBy("author", { descending: true });
+      });
   });
   it("responds with an array of article objects sorted by topic. Status code: 200", () => {
     return request(app)
-    .get("/api/articles?sort_by=topic")
-    .expect(200)
-    .then((res) => {
-      const articles = res.body.articles;
-      expect(articles).toBeSortedBy("topic", { descending: true })
-    })
+      .get("/api/articles?sort_by=topic")
+      .expect(200)
+      .then((res) => {
+        const articles = res.body.articles;
+        expect(articles).toBeSortedBy("topic", { descending: true });
+      });
   });
   it("responds with an array of article objects sorted by created_at. Status code: 200", () => {
     return request(app)
-    .get("/api/articles?sort_by=created_at")
-    .expect(200)
-    .then((res) => {
-      const articles = res.body.articles;
-      expect(articles).toBeSortedBy("created_at", { descending: true })
-    })
+      .get("/api/articles?sort_by=created_at")
+      .expect(200)
+      .then((res) => {
+        const articles = res.body.articles;
+        expect(articles).toBeSortedBy("created_at", { descending: true });
+      });
   });
   it("responds with an array of article objects sorted by votes. Status code: 200", () => {
     return request(app)
-    .get("/api/articles?sort_by=votes")
-    .expect(200)
-    .then((res) => {
-      const articles = res.body.articles;
-      expect(articles).toBeSortedBy("votes", { descending: true })
-    })
+      .get("/api/articles?sort_by=votes")
+      .expect(200)
+      .then((res) => {
+        const articles = res.body.articles;
+        expect(articles).toBeSortedBy("votes", { descending: true });
+      });
   });
   it("responds with error when passed invalid sort_by", () => {
     return request(app)
@@ -509,36 +511,36 @@ describe("GET /api/articles?sort_by=any_valid_column apart from article_img_url"
         expect(err.msg).toBe("invalid given sort_by");
       });
   });
-})
+});
 
 describe("GET /api/articles?order=asc_or_desc", () => {
   it("responds with an array of article objects sorted by ascending order. Status code: 200", () => {
     return request(app)
-    .get("/api/articles?order_by=asc")
-    .expect(200)
-    .then((res) => {
-      const articles = res.body.articles
-      expect(articles).toBeSortedBy("created_at", {descending: false})
-    })
-  })
+      .get("/api/articles?order_by=asc")
+      .expect(200)
+      .then((res) => {
+        const articles = res.body.articles;
+        expect(articles).toBeSortedBy("created_at", { descending: false });
+      });
+  });
   it("responds with an array of article objects sorted by descending order. Status code: 200", () => {
     return request(app)
-    .get("/api/articles?order_by=desc")
-    .expect(200)
-    .then((res) => {
-      const articles = res.body.articles
-      expect(articles).toBeSortedBy("created_at", {descending: true})
-    })
-  })
+      .get("/api/articles?order_by=desc")
+      .expect(200)
+      .then((res) => {
+        const articles = res.body.articles;
+        expect(articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
   it("it responds with an array of article objects sorted by author with ascending order. Status code: 200", () => {
     return request(app)
-    .get("/api/articles?sort_by=author&order_by=asc")
-    .expect(200)
-    .then((res) => {
-      const articles = res.body.articles
-      expect(articles).toBeSortedBy("author", {descending: false})
-    })
-  })
+      .get("/api/articles?sort_by=author&order_by=asc")
+      .expect(200)
+      .then((res) => {
+        const articles = res.body.articles;
+        expect(articles).toBeSortedBy("author", { descending: false });
+      });
+  });
   it("responds with error when passed invalid order_by", () => {
     return request(app)
       .get("/api/articles?order_by=ascending")
@@ -548,7 +550,7 @@ describe("GET /api/articles?order=asc_or_desc", () => {
         expect(err.msg).toBe("invalid given order_by");
       });
   });
-})
+});
 
 describe("invalid api endpoint", () => {
   it("responds with 404 status", () => {
