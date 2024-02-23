@@ -1,6 +1,15 @@
 const express = require("express");
 const app = express();
 app.use(express.json());
+process.env.TZ = 'UTC';
+
+const {
+  handleCustomErrors,
+  handleIncorrectUserName,
+  handleServerErrors,
+  handlePsqlErrors,
+  handleNotFound,
+} = require("./errorhandler");
 
 const {
   getTopics,
@@ -27,33 +36,10 @@ app.patch("/api/articles/:article_id", editVotesByArticleId);
 
 app.delete("/api/comments/:comment_id", deleteCommentById);
 
-app.get("*", (req, res) => {
-  res.status(404).send({ msg: "Page not found" });
-});
-
-app.use((err, req, res, next) => {
-  if (err.code === "23503") {
-    res.status(400).send({ msg: "Incorrect username" });
-  }
-  next(err);
-});
-
-app.use((err, req, res, next) => {
-  if (err.code === "22P02") {
-    res.status(400).send({ msg: "Bad request" });
-  }
-  next(err);
-});
-
-app.use((err, req, res, next) => {
-  if (err.status && err.msg) {
-    res.status(err.status).send({ msg: err.msg });
-  }
-});
-
-app.use((err, req, res, next) => {
-  console.log(err);
-  res.status(500).send({ msg: "Internal Server Error" });
-});
+app.get("*", handleNotFound);
+app.use(handleIncorrectUserName);
+app.use(handlePsqlErrors);
+app.use(handleCustomErrors);
+app.use(handleServerErrors);
 
 module.exports = app;
