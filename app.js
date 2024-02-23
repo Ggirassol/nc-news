@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
 app.use(express.json());
+process.env.TZ = 'UTC';
+
 const {
   handleCustomErrors,
   handleIncorrectUserName,
