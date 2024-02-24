@@ -10,6 +10,8 @@ const {
   selectUsers,
   checkIfTopicExists,
   selectUsersByUsername,
+  selectCommentByCommentId,
+  updateVotesByCommentId,
 } = require("./models");
 
 function getTopics(req, res, next) {
@@ -124,6 +126,18 @@ function getUserByUsername(req, res, next) {
     .catch((err) => next(err));
 }
 
+function editVotesByCommentId(req, res, next) {
+  const commentId = req.params.comment_id;
+  const { inc_votes } = req.body;
+  const promises = [selectCommentByCommentId(commentId), updateVotesByCommentId(commentId, inc_votes)]
+
+  Promise.all(promises)
+  .then((results) => {
+    res.status(200).send({ updatedComment: results[1] })
+  })
+  .catch((err) => next(err))
+}
+
 module.exports = {
   getTopics,
   getDescription,
@@ -135,4 +149,5 @@ module.exports = {
   deleteCommentById,
   getUsers,
   getUserByUsername,
+  editVotesByCommentId
 };

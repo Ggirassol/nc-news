@@ -578,6 +578,69 @@ describe("GET /api/users/:username", () => {
   });
 });
 
+describe("PATCH /api/comments/:comment_id", () => {
+  it("responds with comment with updated votes using the respective comment_id. Status code: 200", () => {
+    return request(app)
+    .patch("/api/comments/5")
+    .send({
+      inc_votes: 5,
+    })
+    .expect(200)
+    .then((res) => {
+      const updatedComment = res.body.updatedComment;
+      expect(updatedComment.votes).toBe(5);
+    });
+  })
+  it("updates a given comment's votes by comment_id when inc_votes is negative", () => {
+    return request(app)
+      .patch("/api/comments/6")
+      .send({
+        inc_votes: -5,
+      })
+      .expect(200)
+      .then((res) => {
+        const updatedComment = res.body.updatedComment;
+        expect(updatedComment.votes).toBe(-5);
+      });
+  });
+  it("responds with an error when request body doesn't have inc_votes property", () => {
+    return request(app)
+      .patch("/api/comments/3")
+      .send({
+        votes: 10,
+      })
+      .expect(400)
+      .then((res) => {
+        const err = res.body;
+        expect(err.msg).toBe("Bad request");
+      });
+  });
+  it("responds with an error when comment type is invalid", () => {
+    return request(app)
+      .patch("/api/comments/one")
+      .send({
+        inc_votes: 5,
+      })
+      .expect(400)
+      .then((res) => {
+        const err = res.body;
+        expect(err.msg).toBe("Bad request");
+      });
+  });
+  it("responds with error when comment type is valid, but comment does not exist", () => {
+    return request(app)
+      .patch("/api/comments/101")
+      .send({
+        inc_votes: 5,
+      })
+      .expect(404)
+      .then((res) => {
+        const err = res.body;
+        expect(err.msg).toBe("Comment id not found");
+      });
+  });
+})
+
 describe("invalid api endpoint", () => {
   it("responds with 404 status", () => {
     return request(app)

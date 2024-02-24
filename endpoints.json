@@ -30,7 +30,7 @@
   "GET /api/articles/:article_id": {
     "description": "serves an article of given article_id",
     "exampleResponse": {
-      "article": [
+      "article":
         {
           "article_id": 1,
           "title": "Living in the shadow of a great man",
@@ -42,7 +42,6 @@
           "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
           "comment_count": 11
         }
-      ]
     }
   },
   "GET /api/articles/:article_id/comments": {
@@ -63,7 +62,7 @@
   "POST /api/articles/:article_id/comments": {
     "description": "adds a comment for an article",
     "exampleResponse": {
-      "newComment": [
+      "newComment":
         {
           "comment_id": 10,
           "votes": 0,
@@ -72,13 +71,12 @@
           "body": "So in love with this article",
           "article_id": 3
         }
-      ]
     }
   },
   "PATCH /api/articles/:article_id": {
     "description": "updates votes for a given article",
     "exampleResponse": {
-      "updatedArticle": [
+      "updatedArticle":
         {
           "article_id": 4,
           "title": "Student SUES Mitch!",
@@ -90,7 +88,6 @@
           "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
           "comment_count": 11
         }
-      ]
     }
   },
   "DELETE /api/comments/:comment_id": {
@@ -117,13 +114,26 @@
   "GET /api/users/:username": {
     "description": "serves an user of given username",
     "exampleResponse": {
-      "user": [
+      "user":
         {
           "username": "butter_bridge",
           "name": "jonny",
           "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
         }
-      ]
+    }
+  },
+  "PATCH /api/comments/:comment_id": {
+    "description": "updates votes for a given",
+    "exampleResponse": {
+      "updatedComment":
+      {
+        "comment_id": 5,
+        "body": "I hate streaming noses",
+        "article_id": 1,
+        "author": "icellusedkars",
+        "votes": 0,
+        "created_at": "2020-11-03T21:00:00.000Z"
+      }
     }
   }
 }
