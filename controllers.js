@@ -9,6 +9,7 @@ const {
   removeCommentById,
   selectUsers,
   checkIfTopicExists,
+  selectUsersByUsername,
 } = require("./models");
 
 function getTopics(req, res, next) {
@@ -114,6 +115,15 @@ function getUsers(req, res, next) {
     .catch((err) => next(err));
 }
 
+function getUserByUsername(req, res, next) {
+  const username = req.params.username;
+  selectUsersByUsername(username)
+    .then((user) => {
+      res.status(200).send({ user });
+    })
+    .catch((err) => next(err));
+}
+
 module.exports = {
   getTopics,
   getDescription,
@@ -124,4 +134,5 @@ module.exports = {
   editVotesByArticleId,
   deleteCommentById,
   getUsers,
+  getUserByUsername,
 };
