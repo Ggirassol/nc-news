@@ -21,6 +21,7 @@ const {
   deleteCommentById,
   getUsers,
   getUserByUsername,
+  editVotesByCommentId,
 } = require("./controllers");
 
 app.get("/api/topics", getTopics);
@@ -34,6 +35,7 @@ app.get("/api/users/:username", getUserByUsername);
 app.post("/api/articles/:article_id/comments", createComment);
 
 app.patch("/api/articles/:article_id", editVotesByArticleId);
+app.patch("/api/comments/:comment_id", editVotesByCommentId)
 
 app.delete("/api/comments/:comment_id", deleteCommentById);
 
