@@ -513,7 +513,7 @@ describe("GET /api/articles?sort_by=any_valid_column apart from article_img_url"
   });
 });
 
-describe("GET /api/articles?order=asc_or_desc", () => {
+describe("GET /api/articles?order_by=asc_or_desc", () => {
   it("responds with an array of article objects sorted by ascending order. Status code: 200", () => {
     return request(app)
       .get("/api/articles?order_by=asc")
@@ -548,6 +548,32 @@ describe("GET /api/articles?order=asc_or_desc", () => {
       .then((res) => {
         const err = res.body;
         expect(err.msg).toBe("invalid given order_by");
+      });
+  });
+});
+
+describe("GET /api/users/:username", () => {
+  it("responds with an user object with respective properties. Status code: 200", () => {
+    request(app)
+      .get("/api/users/butter_bridge")
+      .expect(200)
+      .then((res) => {
+        const user = res.body.user;
+        expect(user).toEqual({
+          username: "butter_bridge",
+          name: "jonny",
+          avatar_url:
+            "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
+        });
+      });
+  });
+  it("responds with error when username does not exist", () => {
+    return request(app)
+      .get("/api/users/girassol")
+      .expect(404)
+      .then((res) => {
+        const err = res.body;
+        expect(err.msg).toBe("Username not found");
       });
   });
 });
