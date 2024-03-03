@@ -12,6 +12,7 @@ const {
   selectUsersByUsername,
   selectCommentByCommentId,
   updateVotesByCommentId,
+  addArticle,
 } = require("./models");
 
 function getTopics(req, res, next) {
@@ -138,6 +139,18 @@ function editVotesByCommentId(req, res, next) {
   .catch((err) => next(err))
 }
 
+function createArticle(req, res, next) {
+  const body = req.body;
+  addArticle(body)
+    .then((article_id) => {
+      return selectArticleById(article_id);
+    })
+    .then((newArticle) => {
+      res.status(201).send({ newArticle });
+    })
+    .catch((err) => next(err));
+}
+
 module.exports = {
   getTopics,
   getDescription,
@@ -149,5 +162,6 @@ module.exports = {
   deleteCommentById,
   getUsers,
   getUserByUsername,
-  editVotesByCommentId
+  editVotesByCommentId,
+  createArticle
 };
