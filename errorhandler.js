@@ -6,6 +6,9 @@ const handleCustomErrors = (err, req, res, next) => {
 
 const handleIncorrectUserName = (err, req, res, next) => {
   if (err.code === "23503") {
+    if (err.constraint === 'articles_topic_fkey') {
+      res.status(400).send({ msg: "Choose a valid topic" });
+    }
     res.status(400).send({ msg: "Incorrect username" });
   }
   next(err);

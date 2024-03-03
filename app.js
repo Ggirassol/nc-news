@@ -22,6 +22,7 @@ const {
   getUsers,
   getUserByUsername,
   editVotesByCommentId,
+  createArticle,
 } = require("./controllers");
 
 app.get("/api/topics", getTopics);
@@ -33,6 +34,7 @@ app.get("/api/users", getUsers);
 app.get("/api/users/:username", getUserByUsername);
 
 app.post("/api/articles/:article_id/comments", createComment);
+app.post("/api/articles", createArticle)
 
 app.patch("/api/articles/:article_id", editVotesByArticleId);
 app.patch("/api/comments/:comment_id", editVotesByCommentId)

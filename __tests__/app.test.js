@@ -641,6 +641,160 @@ describe("PATCH /api/comments/:comment_id", () => {
   });
 })
 
+describe("POST /api/articles", () => {
+  it("responds with the newly added article, when request body is an object with author, title, body and topic properties. No article_img_url provided, set to default. Status code: 201", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "butter_bridge",
+        title: "The aliens are back",
+        body: "The aliens are searching for Mitch. They're on a mission to find him. What do they want with Mitch? It's a mystery waiting to unfold.",
+        topic: "mitch",
+      })
+      .expect(201)
+      .then((res) => {
+        const newArticle = res.body.newArticle;
+        expect(newArticle).toMatchObject({
+          article_id: 14,
+          title: "The aliens are back",
+          author: "butter_bridge",
+          topic: "mitch",
+          body: "The aliens are searching for Mitch. They're on a mission to find him. What do they want with Mitch? It's a mystery waiting to unfold.",
+          created_at: expect.any(String),
+          votes: 0,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          comment_count: 0
+        });
+      });
+  });
+  it("responds with the newly added article, when request body is an object with author, title, body, topic and article_img_url properties. Status code: 201. Articles length is increased by one", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "lurker",
+        title: "The dogs saved the day",
+        body: "The dogs reunited and saved Mitch from being held as a prisioner in the aliens spaceship.",
+        topic: "mitch",
+        article_img_url:
+          "https://t4.ftcdn.net/jpg/03/67/80/73/360_F_367807368_IHHjw2IZI27bFIs2DlZ5LkwYwKvkjrQr.jpg",
+      })
+      .expect(201)
+      .then((res) => {
+        const newArticle = res.body.newArticle;
+        expect(newArticle).toMatchObject({
+          article_id: 14,
+          title: "The dogs saved the day",
+          author: "lurker",
+          topic: "mitch",
+          body: "The dogs reunited and saved Mitch from being held as a prisioner in the aliens spaceship.",
+          created_at: expect.any(String),
+          votes: 0,
+          article_img_url:
+            "https://t4.ftcdn.net/jpg/03/67/80/73/360_F_367807368_IHHjw2IZI27bFIs2DlZ5LkwYwKvkjrQr.jpg",
+          comment_count: 0
+        });
+      })
+      .then(() => {
+        return request(app)
+          .get("/api/articles")
+          .then((res) => {
+            const articles = res.body.articles;
+            expect(articles).toHaveLength(14);
+          });
+      });
+  });
+  it("responds with an error when request body doesn't have author property", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        username: "rogersop",
+        title: "The dogs saved the day",
+        body: "The dogs reunited and saved Mitch from being held as a prisioner in the aliens spaceship.",
+        topic: "mitch"
+      })
+      .expect(400)
+      .then((res) => {
+        const err = res.body;
+        expect(err.msg).toBe("Bad request");
+      });
+  });
+  it("responds with an error when request body doesn't have title property", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "rogersop",
+        body: "The dogs reunited and saved Mitch from being held as a prisioner in the aliens spaceship.",
+        topic: "mitch"
+      })
+      .expect(400)
+      .then((res) => {
+        const err = res.body;
+        expect(err.msg).toBe("Bad request");
+      });
+  });
+  it("responds with an error when request body doesn't have body property", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "rogersop",
+        title: "The dogs saved the day",
+        article: "The dogs reunited and saved Mitch from being held as a prisioner in the aliens spaceship.",
+        topic: "mitch"
+      })
+      .expect(400)
+      .then((res) => {
+        const err = res.body;
+        expect(err.msg).toBe("Bad request");
+      });
+  });
+  it("responds with an error when request body doesn't have topic property", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "rogersop",
+        title: "The dogs saved the day",
+        article: "The dogs reunited and saved Mitch from being held as a prisioner in the aliens spaceship.",
+        about: "mitch"
+      })
+      .expect(400)
+      .then((res) => {
+        const err = res.body;
+        expect(err.msg).toBe("Bad request");
+      });
+  });
+  it("responds with an error when unrecognised user trying to post an article", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "NonExistent",
+        title: "The dogs saved the day",
+        body: "The dogs reunited and saved Mitch from being held as a prisioner in the aliens spaceship.",
+        topic: "mitch"
+      })
+      .expect(400)
+      .then((res) => {
+        const err = res.body;
+        expect(err.msg).toBe("Incorrect username");
+      });
+  });
+  it("responds with an error when topic does not exist", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "butter_bridge",
+        title: "The dogs saved the day",
+        body: "The dogs reunited and saved Mitch from being held as a prisioner in the aliens spaceship.",
+        topic: "butterflies"
+      })
+      .expect(400)
+      .then((res) => {
+        const err = res.body;
+        expect(err.msg).toBe("Choose a valid topic");
+      });
+  });
+});
+
 describe("invalid api endpoint", () => {
   it("responds with 404 status", () => {
     return request(app)
