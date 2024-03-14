@@ -502,6 +502,15 @@ describe("GET /api/articles?sort_by=any_valid_column apart from article_img_url"
         expect(articles).toBeSortedBy("votes", { descending: true });
       });
   });
+  it("responds with an array of article objects sorted by comment_count. Status code: 200", () => {
+    return request(app)
+      .get("/api/articles?sort_by=comment_count")
+      .expect(200)
+      .then((res) => {
+        const articles = res.body.articles;
+        expect(articles).toBeSortedBy("comment_count", { descending: true });
+      });
+  });
   it("responds with error when passed invalid sort_by", () => {
     return request(app)
       .get("/api/articles?sort_by=article_img_url")
