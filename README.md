@@ -1,6 +1,6 @@
 # Checkout hosted version
 
-https://nc-news-8ork.onrender.com
+https://nc-news-8ork.onrender.com/api
 
 # About this project
 
