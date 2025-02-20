@@ -5,38 +5,28 @@ on:
       - main
 
 jobs:
-  test-utils:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - name: clone repo and checkout main
+      - name: Checkout Repo
         uses: actions/checkout@v4
-      - name: install dependencies
-        run: npm install
-      - name: run tests
-        run: npm run test-utils
-  test-app:
-    runs-on: ubuntu-latest
-    needs: test-utils
-    steps:
-      - name: clone repo and checkout main
-        uses: actions/checkout@v4
-      - name: install dependencies
-        run: npm install
+      - name: Use Node.js
+        uses: actions/setup-node@v4
       - name: setup psql
         uses: harmon758/postgresql-action@v1
         with:
           postgresql db: test_db
           postgresql password: password
           postgresql user: girassol
+      - name: install dependencies
+        run: npm ci
+      - name: run utils tests
+        run: npm run test-utils
       - name: run tests
         run: PGDATABASE=test_db PGPASSWORD=password PGUSER=girassol npm run test-app
-  test-live-db:
+  deploy:
     runs-on: ubuntu-latest
-    needs: test-app
+    needs: test
     steps:
-      - name: clone repo and checkout main
-        uses: actions/checkout@v4
-      - name: install dependencies
-        run: npm install
-      - name: run tests
-        run: NODE_ENV=production DATABASE_URL=${{ secrets.DATABASE_URL }} npm run test-app
+      - name: Deploy to Render
+        run: NODE_ENV=production curl ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
